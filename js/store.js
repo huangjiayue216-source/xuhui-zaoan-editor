@@ -265,6 +265,27 @@ window.App = window.App || {};
         A.emit('image', src);
       };
       img.onerror = function () {
+        // 兜底：底图用的是带版本号的文件但它已不存在时（例如浏览器还缓存着旧代码），
+        // 自动回退到当前默认底图，避免出现「看不到底图」。
+        const fallbackSrc = A.TEMPLATE_SRC;
+        if (/^assets\/template-v\d+\.png$/.test(src) && fallbackSrc && fallbackSrc !== src) {
+          const fb = A.image(fallbackSrc);
+          const adopt = function () {
+            if (fb && fb.ready) {
+              entry.img = fb.img;
+              entry.ready = true;
+              entry.failed = false;
+              A.emit('image', src);
+            } else if (fb && fb.failed) {
+              entry.failed = true;
+              A.emit('image', src);
+            } else {
+              setTimeout(adopt, 200);
+            }
+          };
+          adopt();
+          return;
+        }
         entry.failed = true;
         A.emit('image', src);
       };
