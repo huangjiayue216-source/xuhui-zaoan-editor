@@ -5,6 +5,11 @@ window.App = window.App || {};
 
   A.DESIGN = { w: 1276, h: 2846 };
 
+  /* ---- 默认底图设置（换底图时由「换底图.bat」自动修改下面 3 行）---- */
+  A.TEMPLATE_VERSION = 1;
+  A.TEMPLATE_SRC = 'assets/template.png';
+  A.FRAME_DEFAULT = { x: 90, y: 649, w: 1098, h: 1466 };
+
   let seed = 0;
   A.uid = function (prefix) {
     seed += 1;
@@ -30,10 +35,15 @@ window.App = window.App || {};
       width: D.w,
       height: D.h,
       template: {
-        id: 'template-1', kind: 'template', src: 'assets/template.png', assetId: null,
+        id: 'template-1', kind: 'template', src: A.TEMPLATE_SRC, assetId: null,
         x: 0, y: 0, w: D.w, h: D.h, rotation: 0, opacity: 1, visible: true, locked: false
       },
-      frame: { x: 90, y: 649, w: 1098, h: 1466, clip: true, visible: true },
+      frame: {
+        x: A.FRAME_DEFAULT.x, y: A.FRAME_DEFAULT.y,
+        w: A.FRAME_DEFAULT.w, h: A.FRAME_DEFAULT.h,
+        clip: true, visible: true
+      },
+      templateVersion: A.TEMPLATE_VERSION,
       photos: [],
       texts: [
         {
@@ -107,7 +117,31 @@ window.App = window.App || {};
 
   /* 旧数据修正：早期版本「周几」的竖排行距偏大，这里按原版样式纠正一次 */
   function migrate(project) {
-    if (!project || !project.texts) return project;
+    if (!project) return project;
+
+    /* 底图（模板）换版本时：默认底图与照片区跟着更新。
+       注意：这里只改「背景模板」，用户上传的照片、照片位置和文字都不动。*/
+    const tpl = project.template;
+    if (tpl && !tpl.assetId) {
+      tpl.src = A.TEMPLATE_SRC;
+      if (tpl.visible === undefined) tpl.visible = true;
+      if (project.templateVersion !== A.TEMPLATE_VERSION) {
+        tpl.x = 0; tpl.y = 0;
+        tpl.w = A.DESIGN.w; tpl.h = A.DESIGN.h;
+        tpl.rotation = 0; tpl.opacity = 1; tpl.visible = true;
+        if (project.frame) {
+          project.frame.x = A.FRAME_DEFAULT.x;
+          project.frame.y = A.FRAME_DEFAULT.y;
+          project.frame.w = A.FRAME_DEFAULT.w;
+          project.frame.h = A.FRAME_DEFAULT.h;
+          project.frame.clip = true;
+          project.frame.visible = true;
+        }
+      }
+    }
+    project.templateVersion = A.TEMPLATE_VERSION;
+
+    if (!project.texts) return project;
     const wk = project.texts.find(function (t) { return t.id === 't-weekday'; });
     if (wk) {
       if (Math.abs((wk.lineHeight || 0) - 1.23) < 0.02) {
