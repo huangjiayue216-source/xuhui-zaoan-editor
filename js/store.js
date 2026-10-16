@@ -6,8 +6,8 @@ window.App = window.App || {};
   A.DESIGN = { w: 1276, h: 2846 };
 
   /* ---- 默认底图设置（换底图时由「换底图.bat」自动修改下面 3 行）---- */
-  A.TEMPLATE_VERSION = 2;
-  A.TEMPLATE_SRC = 'assets/template-v2.png';
+  A.TEMPLATE_VERSION = 1;
+  A.TEMPLATE_SRC = 'assets/template.png';
   A.FRAME_DEFAULT = { x: 90, y: 649, w: 1098, h: 1466 };
 
   let seed = 0;
