@@ -184,7 +184,7 @@ window.App = window.App || {};
       if (size && document.activeElement !== size) size.value = Math.round(cap.fontSize);
     }
     const name = $('docName');
-    if (name) name.textContent = p.name || '早安徐汇';
+    if (name) name.textContent = p.name || '你好徐汇';
   }
 
   /* ------------------------------ 导出 ------------------------------ */
@@ -194,7 +194,7 @@ window.App = window.App || {};
     const a = document.createElement('a');
     const d = new Date();
     a.href = url;
-    a.download = '早安徐汇-' + d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') +
+    a.download = '你好徐汇-' + d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') +
       String(d.getDate()).padStart(2, '0') + '.png';
     document.body.appendChild(a);
     a.click();
