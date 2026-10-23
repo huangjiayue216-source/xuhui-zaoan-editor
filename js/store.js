@@ -31,7 +31,7 @@ window.App = window.App || {};
   A.defaultProject = function () {
     const D = A.DESIGN;
     return {
-      name: '你好徐汇',
+      name: '徐汇你早',
       width: D.w,
       height: D.h,
       template: {
@@ -141,8 +141,8 @@ window.App = window.App || {};
     }
     project.templateVersion = A.TEMPLATE_VERSION;
 
-    // 产品改名：旧存档里的项目名同步为「你好徐汇」
-    if (project.name === '早安徐汇' || !project.name) project.name = '你好徐汇';
+    // 产品改名：旧存档里的项目名同步为「徐汇你早」
+    if (project.name === '早安徐汇' || project.name === '你好徐汇' || !project.name) project.name = '徐汇你早';
 
     if (!project.texts) return project;
     const wk = project.texts.find(function (t) { return t.id === 't-weekday'; });
@@ -599,7 +599,7 @@ window.App = window.App || {};
     const a = document.createElement('a');
     const d = new Date();
     a.href = url;
-    a.download = (state.project.name || '你好徐汇') + '-' +
+    a.download = (state.project.name || '徐汇你早') + '-' +
       d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0') +
       String(d.getHours()).padStart(2, '0') + String(d.getMinutes()).padStart(2, '0') + '.json';
     document.body.appendChild(a);
