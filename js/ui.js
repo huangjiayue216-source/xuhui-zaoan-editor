@@ -64,6 +64,36 @@ window.App = window.App || {};
 
   const CN_MONTH = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
   const CN_WEEK = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+  const CN_DAY = ['初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十',
+    '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十',
+    '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'];
+  const ZODIAC = ['鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪'];
+
+  /* 公历 → 农历（用浏览器内置的中国农历 ICU 数据，含闰月）
+     返回 { year: '丙午马年', monthDay: '九月初三' }，不支持时返回 null */
+  function lunarInfo(date) {
+    try {
+      const parts = new Intl.DateTimeFormat('zh-CN-u-ca-chinese', {
+        year: 'numeric', month: 'long', day: 'numeric'
+      }).formatToParts(date);
+      const get = function (type) {
+        const hit = parts.find(function (p) { return p.type === type; });
+        return hit ? hit.value : '';
+      };
+      const yearName = get('yearName');
+      const monthName = get('month');
+      const dayNum = parseInt(get('day'), 10);
+      const relatedYear = parseInt(get('relatedYear'), 10) || date.getFullYear();
+      if (!yearName || !monthName || !dayNum) return null;
+      const zodiac = ZODIAC[(((relatedYear - 4) % 12) + 12) % 12];
+      return {
+        year: yearName + zodiac + '年',
+        monthDay: monthName + (CN_DAY[dayNum - 1] || '')
+      };
+    } catch (e) {
+      return null;
+    }
+  }
 
   function todayString(offsetDays) {
     const d = new Date();
@@ -79,6 +109,7 @@ window.App = window.App || {};
     const monthText = CN_MONTH[d.getMonth()];
     const dayText = String(d.getDate());
     const weekText = CN_WEEK[d.getDay()];
+    const lunar = lunarInfo(d);
     A.commit(function (p) {
       const set = function (id, text) {
         const t = p.texts.find(function (x) { return x.id === id; });
@@ -87,10 +118,15 @@ window.App = window.App || {};
       set('t-month', monthText);
       set('t-date', dayText);
       set('t-weekday', weekText);
+      if (lunar) {
+        set('t-lunar-year', lunar.year);
+        set('t-lunar-month', lunar.monthDay);
+      }
     });
     A.layoutCacheReset();
     syncFields();
-    A.toast('已填入 ' + monthText + ' / ' + dayText + ' / ' + weekText + '，农历请按当天填写');
+    A.toast('已填入 ' + monthText + ' / ' + dayText + ' / ' + weekText +
+      '，农历 ' + (lunar ? lunar.year + ' ' + lunar.monthDay : '未识别（浏览器不支持农历转换）'));
   }
 
   /* ---------------------------- 图片板块 ---------------------------- */
